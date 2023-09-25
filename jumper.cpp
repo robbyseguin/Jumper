@@ -6,8 +6,18 @@ int main()
 const int screenWidth = 800;
 const int screenHeight = 600;
 
-//Player Variables
-const int playerJumpHeight = 25;
+//Player Variables ( Pixels/Second)
+const int playerJumpHeight = -550;
+
+// Game Engine Physics Variables (Pixels/Second)
+int velocity = 0;
+int gravity = 1000;
+
+// is Conditions
+bool isJumping = false;
+
+// Window init
+InitWindow(screenWidth, screenHeight, "Jumper");
 
 //Player Texture
 
@@ -22,19 +32,13 @@ playerPos.x = screenWidth / 2 - playerRect.width / 2;
 playerPos.y = screenHeight - playerRect.height;
 
 
-// Game Engine Physics Variables
-int velocity = 0;
-int gravity = 1;
 
-// is Conditions
-bool isJumping = false;
-
-// Window init
-InitWindow(screenWidth, screenHeight, "Jumper");
+//Set FPS
 SetTargetFPS(60);
 
 while(!WindowShouldClose())
 {   
+    float deltaTime = GetFrameTime();
     //Start Drawing
     BeginDrawing();
     ClearBackground(RAYWHITE);
@@ -48,17 +52,18 @@ while(!WindowShouldClose())
     else
     {
     // update gravity
-    velocity += gravity;
+    velocity += gravity * deltaTime;
     isJumping = true;
     }
     
      if(IsKeyDown(KEY_SPACE) && !isJumping)
     {
-        velocity -= playerJumpHeight;
+        velocity += playerJumpHeight;
     }
 
     // update Y position
-    playerPos.y += velocity;
+    playerPos.y += velocity * deltaTime;
+    
     DrawTextureRec(player, playerRect, playerPos, WHITE);
 
     //End Drawing
