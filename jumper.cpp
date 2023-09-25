@@ -2,7 +2,6 @@
 
 int main()
 {
-
 // Screen Size
 const int screenWidth = 800;
 const int screenHeight = 600;
@@ -11,6 +10,7 @@ const int screenHeight = 600;
 const int playerJumpHeight = 25;
 
 //Player Texture
+
 Texture2D player = LoadTexture("textures/scarfy.png");
 Rectangle playerRect;
 playerRect.width = player.width / 6;
@@ -39,7 +39,7 @@ while(!WindowShouldClose())
     BeginDrawing();
     ClearBackground(RAYWHITE);
     
-    if(playerRect.y >= screenHeight - playerRect.height)
+    if(playerPos.y >= screenHeight - playerRect.height)
     {   
         // stop velocity
         velocity = 0;
