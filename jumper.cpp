@@ -19,8 +19,12 @@ bool isJumping = false;
 // Window init
 InitWindow(screenWidth, screenHeight, "Jumper");
 
-//Player Texture
+//Hazard Texture
+Texture2D hazard = LoadTexture("textures/12_nebula_spritesheet.png");
 
+
+
+//Player Texture
 Texture2D player = LoadTexture("textures/scarfy.png");
 Rectangle playerRect;
 playerRect.width = player.width / 6;
@@ -31,6 +35,11 @@ Vector2 playerPos;
 playerPos.x = screenWidth / 2 - playerRect.width / 2;
 playerPos.y = screenHeight - playerRect.height;
 
+//animation frame
+int frame = 0;
+// time before we update animation frame
+const float updateTime = 1.0f / 12.0f;
+float runningTime = 0.0f;
 
 
 //Set FPS
@@ -63,7 +72,20 @@ while(!WindowShouldClose())
 
     // update Y position
     playerPos.y += velocity * deltaTime;
-    
+    //update running time
+    runningTime += deltaTime;
+    if(runningTime >= updateTime)
+    {
+        runningTime = 0.0f;
+    playerRect.x = frame * playerRect.width;
+    frame++;
+    if(frame > 5)
+    {
+        frame = 0;
+    }
+    }
+
+    //Draw Player  
     DrawTextureRec(player, playerRect, playerPos, WHITE);
 
     //End Drawing
