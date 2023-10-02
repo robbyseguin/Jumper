@@ -23,9 +23,13 @@ InitWindow(screenWidth, screenHeight, "Jumper");
 Texture2D hazard = LoadTexture("textures/12_nebula_spritesheet.png");
 Rectangle hazardRect = {0.0f, 0.0f, hazard.width / 8, hazard.height / 8};
 Vector2 hazardPos = {screenWidth , screenHeight - hazardRect.height};
+int hazardFrame = 0;
+const float hazardUpdateTime = 1.0f / 12.0f;
+float hazardRunningTime = 0.0f; 
+
 
 //Hazard Velocity pixel per second
-int hazardVelocity = -600;
+int hazardVelocity = -200;
 
 //Player Texture
 Texture2D player = LoadTexture("textures/scarfy.png");
@@ -76,9 +80,9 @@ while(!WindowShouldClose())
     // update Hazard X position
      hazardPos.x += hazardVelocity * deltaTime;
 
-
     // update Player Y position
     playerPos.y += velocity * deltaTime;
+
     //update running time
     runningTime += deltaTime;
 
@@ -86,16 +90,35 @@ while(!WindowShouldClose())
     {
       if(runningTime >= updateTime)
     {
-        runningTime = 0.0f;
+
+    runningTime = 0.0f;
     playerRect.x = frame * playerRect.width;
     frame++;
+
     if(frame > 5)
     {
         frame = 0;
     }
     }  
     }
-   
+  
+   // Update hazardrunning time
+    hazardRunningTime += deltaTime;
+
+   // Update hazard animation  
+    if(hazardRunningTime >= hazardUpdateTime)
+    {
+
+    hazardRunningTime = 0.0f;
+    hazardRect.x = hazardFrame * hazardRect.width;
+    hazardFrame++;
+
+    if(hazardFrame > 7)
+    {
+        hazardFrame = 0;
+    }
+    }  
+    
 
 
 
