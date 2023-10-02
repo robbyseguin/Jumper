@@ -22,7 +22,7 @@ InitWindow(screenWidth, screenHeight, "Jumper");
 //Hazard Texture
 Texture2D hazard = LoadTexture("textures/12_nebula_spritesheet.png");
 Rectangle hazardRect = {0.0f, 0.0f, hazard.width / 8, hazard.height / 8};
-Vector2 hazardPos = {screenWidth , screenHeight / 2 - hazardRect.height};
+Vector2 hazardPos = {screenWidth , screenHeight - hazardRect.height};
 
 //Hazard Velocity pixel per second
 int hazardVelocity = -600;
@@ -63,24 +63,28 @@ while(!WindowShouldClose())
     }
     else
     {
-    // update gravity
-    velocity += gravity * deltaTime;
-    isJumping = true;
+        // update gravity
+        velocity += gravity * deltaTime;
+        isJumping = true;
     }
     
      if(IsKeyDown(KEY_SPACE) && !isJumping)
     {
         velocity += playerJumpHeight;
     }
+
     // update Hazard X position
-    hazardPos.x += hazardVelocity * deltaTime;
+     hazardPos.x += hazardVelocity * deltaTime;
 
 
     // update Player Y position
     playerPos.y += velocity * deltaTime;
     //update running time
     runningTime += deltaTime;
-    if(runningTime >= updateTime)
+
+    if(!isJumping)
+    {
+      if(runningTime >= updateTime)
     {
         runningTime = 0.0f;
     playerRect.x = frame * playerRect.width;
@@ -89,7 +93,12 @@ while(!WindowShouldClose())
     {
         frame = 0;
     }
+    }  
     }
+   
+
+
+
     //Draw Hazard
     DrawTextureRec(hazard, hazardRect, hazardPos, WHITE);
 
