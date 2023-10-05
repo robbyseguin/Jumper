@@ -1,5 +1,5 @@
 #include "raylib.h"
-
+#include <array>
 
 struct AnimData
 {
@@ -14,8 +14,7 @@ float runningTime;
 int main()
 {
 // Screen Size
-const int screenWidth = 800;
-const int screenHeight = 600;
+int windowDimensions[2] = {800, 600};
 
 //Player Variables ( Pixels/Second)
 const int playerJumpHeight = -550;
@@ -28,29 +27,27 @@ int gravity = 1000;
 bool isJumping = false;
 
 // Window init
-InitWindow(screenWidth, screenHeight, "Jumper");
+InitWindow(windowDimensions[0], windowDimensions[1], "Jumper");
 
 //Hazard Texture
 Texture2D hazard = LoadTexture("textures/12_nebula_spritesheet.png");
 
-AnimData hazardData
-{
-    {0.0f, 0.0f, hazard.width / 8, hazard.height / 8}, // Rectangle
-    {screenWidth , screenHeight - hazard.height / 8},   // Vec2 Pos
-    0, // Frame
-    1.0f / 12.0f, // updateTime
-    0.0f //running time
-};
+const int sizeOfHazardArray = 6;
+AnimData hazardArray[sizeOfHazardArray] = {};
 
-AnimData hazard2Data
+for(int i = 0; i < sizeOfHazardArray; i++)
 {
-    {0.0f, 0.0f, hazard.width / 8, hazard.height / 8}, // Rectangle
-    {screenWidth + 300 , screenHeight - hazard.height / 8},   // Vec2 Pos
-    0, // Frame
-    1.0f / 16.0f, // updateTime
-    0.0f //running time
-};
-
+    hazardArray[i].rec.x = 0.0;
+    hazardArray[i].rec.y = 0.0;
+    hazardArray[i].rec.width = hazard.width / 8;
+    hazardArray[i].rec.height = hazard.height / 8;
+    hazardArray[i].pos.x = windowDimensions[0] + 300 * i;
+    hazardArray[i].pos.y = windowDimensions[1] - hazard.height / 8;
+    hazardArray[i].frame = 0;
+    hazardArray[i].updateTime = 1.0f / 12.0f;
+    hazardArray[i].runningTime = 0.0f;
+    hazardArray[i].pos.x = windowDimensions[0] + 300 * i;
+}
 
 //Hazard Velocity pixel per second
 int hazardVelocity = -200;
@@ -62,11 +59,11 @@ playerData.rec.width = player.width / 6;
 playerData.rec.height = player.height;
 playerData.rec.x = 0;
 playerData.rec.y = 0;
-playerData.pos.x = screenWidth / 2 - playerData.rec.width / 2;
-playerData.pos.y = screenHeight - playerData.rec.height;
+playerData.pos.x = windowDimensions[0] / 2 - playerData.rec.width / 2;
+playerData.pos.y = windowDimensions[1] - playerData.rec.height;
 playerData.frame = 0;
 playerData.updateTime = 1.0f / 12.0f;
-playerData.runningTime = 0.0f;
+playerData.runningTime = 0.0f / 0.16f;
 
 
 //Set FPS
@@ -79,7 +76,7 @@ while(!WindowShouldClose())
     BeginDrawing();
     ClearBackground(RAYWHITE);
     
-    if(playerData.pos.y >= screenHeight - playerData.rec.height)
+    if(playerData.pos.y >= windowDimensions[1] - playerData.rec.height)
     {   
         // stop velocity
         velocity = 0;
@@ -97,12 +94,13 @@ while(!WindowShouldClose())
         velocity += playerJumpHeight;
     }
 
-    // update Hazard X position
-    hazardData.pos.x += hazardVelocity * deltaTime;
+    for (int i = 0; i < sizeOfHazardArray; i++)
+    {
+        // update Hazard X position
+    hazardArray[i].pos.x += hazardVelocity * deltaTime;
 
-     // update Hazard2 X position
-    hazard2Data.pos.x += hazardVelocity * deltaTime;
-
+    }
+  
     // update Player Y position
     playerData.pos.y += velocity * deltaTime;
 
@@ -125,48 +123,31 @@ while(!WindowShouldClose())
     }  
     }
   
-   // Update hazardrunning time
-    hazardData.runningTime += deltaTime;
 
-   // Update hazard animation  
-    if(hazardData.runningTime >= hazardData.updateTime)
-    {
-
-    hazardData.runningTime = 0.0f;
-    hazardData.rec.x = hazardData.frame * hazardData.rec.width;
-    hazardData.frame++;
-
-    if(hazardData.frame > 7)
-    {
-        hazardData.frame = 0;
-    }
-    }  
-
+  for(int i = 0; i< sizeOfHazardArray; i++)
+  {
     // Update hazardrunning time
-    hazard2Data.runningTime += deltaTime;
+    hazardArray[i].runningTime += deltaTime;
 
    // Update hazard animation  
-    if(hazard2Data.runningTime >= hazard2Data.updateTime)
+    if(hazardArray[i].runningTime >= hazardArray[i].updateTime)
     {
+        hazardArray[i].runningTime = 0.0f;
+        hazardArray[i].rec.x = hazardArray[i].frame * hazardArray[i].rec.width;
+        hazardArray[i].frame++;
 
-    hazard2Data.runningTime = 0.0f;
-    hazard2Data.rec.x = hazard2Data.frame * hazard2Data.rec.width;
-    hazard2Data.frame++;
-
-    if(hazard2Data.frame > 7)
-    {
-        hazard2Data.frame = 0;
+        if(hazardArray[i].frame > 7)
+        {
+            hazardArray[i].frame = 0;
+        }
     }
-    }  
-    
-
-
-
-    //Draw Hazard
-    DrawTextureRec(hazard, hazardData.rec, hazardData.pos, WHITE);
-     //Draw Hazard 2
-    DrawTextureRec(hazard, hazard2Data.rec, hazard2Data.pos, RED);
-
+  }
+ 
+    //Draw Hazards
+    for(int i = 0; i < sizeOfHazardArray; i++)
+    {
+        DrawTextureRec(hazard, hazardArray[i].rec, hazardArray[i].pos, WHITE);
+    }
     //Draw Player  
     DrawTextureRec(player, playerData.rec, playerData.pos, WHITE);
 
