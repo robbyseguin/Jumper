@@ -10,6 +10,36 @@ float updateTime;
 float runningTime;
 };
 
+bool isOnGround(AnimData data, int windowHeight)
+{
+    return data.pos.y >= windowHeight - data.rec.height;
+}
+
+void updatePlayerData(AnimData &player, bool &isJumping, int velocity, float deltaTime)
+{
+
+    // update Player Y position
+    player.pos.y += velocity * deltaTime;
+
+    //update running time
+    player.runningTime += deltaTime;
+
+    if(!isJumping)
+    {
+     if(player.runningTime >= player.updateTime)
+     {
+
+      player.runningTime = 0.0f;
+      player.rec.x = player.frame * player.rec.width;
+      player.frame++;
+
+      if(player.frame > 5)
+       {
+        player.frame = 0;
+       }
+     }  
+    }
+}
 
 int main()
 {
@@ -76,7 +106,7 @@ while(!WindowShouldClose())
     BeginDrawing();
     ClearBackground(RAYWHITE);
     
-    if(playerData.pos.y >= windowDimensions[1] - playerData.rec.height)
+    if(isOnGround(playerData, windowDimensions[1]))
     {   
         // stop velocity
         velocity = 0;
@@ -101,29 +131,8 @@ while(!WindowShouldClose())
 
     }
   
-    // update Player Y position
-    playerData.pos.y += velocity * deltaTime;
-
-    //update running time
-    playerData.runningTime += deltaTime;
-
-    if(!isJumping)
-    {
-      if(playerData.runningTime >= playerData.updateTime)
-    {
-
-    playerData.runningTime = 0.0f;
-    playerData.rec.x = playerData.frame * playerData.rec.width;
-    playerData.frame++;
-
-    if(playerData.frame > 5)
-    {
-        playerData.frame = 0;
-    }
-    }  
-    }
+  updatePlayerData(playerData, isJumping, velocity, deltaTime);
   
-
   for(int i = 0; i< sizeOfHazardArray; i++)
   {
     // Update hazardrunning time
