@@ -15,31 +15,30 @@ bool isOnGround(AnimData data, int windowHeight)
     return data.pos.y >= windowHeight - data.rec.height;
 }
 
-void updatePlayerData(AnimData &player, bool &isJumping, int velocity, float deltaTime)
+void updateData(AnimData &data, float deltaTime, int maxFrame)
 {
+data.runningTime += deltaTime;
+if(data.runningTime >= data.updateTime)
+{
+    data.runningTime = 0.0f;
+    data.rec.x = data.frame * data.rec.width;
+    data.frame++;
 
-    // update Player Y position
-    player.pos.y += velocity * deltaTime;
-
-    //update running time
-    player.runningTime += deltaTime;
-
-    if(!isJumping)
+    if(data.frame > maxFrame)
     {
-     if(player.runningTime >= player.updateTime)
-     {
-
-      player.runningTime = 0.0f;
-      player.rec.x = player.frame * player.rec.width;
-      player.frame++;
-
-      if(player.frame > 5)
-       {
-        player.frame = 0;
-       }
-     }  
+        data.frame = 0;
     }
 }
+}
+void updateXPos(AnimData &data, int velocity, float deltaTime)
+{
+    data.pos.x += velocity * deltaTime;
+}
+void updateYPos(AnimData &data, int velocity, float deltaTime)
+{
+    data.pos.y += velocity * deltaTime;
+}
+
 
 int main()
 {
@@ -126,30 +125,23 @@ while(!WindowShouldClose())
 
     for (int i = 0; i < sizeOfHazardArray; i++)
     {
-        // update Hazard X position
-    hazardArray[i].pos.x += hazardVelocity * deltaTime;
-
+    // update Hazard X position
+    updateXPos(hazardArray[i], hazardVelocity, deltaTime);
     }
   
-  updatePlayerData(playerData, isJumping, velocity, deltaTime);
-  
-  for(int i = 0; i< sizeOfHazardArray; i++)
-  {
-    // Update hazardrunning time
-    hazardArray[i].runningTime += deltaTime;
+    // update Player Y position
+    updateYPos(playerData, velocity, deltaTime);
 
-   // Update hazard animation  
-    if(hazardArray[i].runningTime >= hazardArray[i].updateTime)
+    if(!isJumping)
     {
-        hazardArray[i].runningTime = 0.0f;
-        hazardArray[i].rec.x = hazardArray[i].frame * hazardArray[i].rec.width;
-        hazardArray[i].frame++;
-
-        if(hazardArray[i].frame > 7)
-        {
-            hazardArray[i].frame = 0;
-        }
+     updateData(playerData, deltaTime, 5);
     }
+  
+
+  for(int i = 0; i< sizeOfHazardArray; i++)
+  {   
+   // Update hazard animation  
+    updateData(hazardArray[i], deltaTime, 7);
   }
  
     //Draw Hazards
